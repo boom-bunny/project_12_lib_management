@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import loan_table %}
+{% block title %}Loans{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1>Loans</h1>
+  <a class="btn primary" href="{{ url_for('loan_issue') }}">Issue a book</a>
+</header>
+
+<nav class="tabs">
+  {% for key, label in [('open', 'On loan'), ('overdue', 'Overdue'), ('returned', 'Returned'), ('all', 'All')] %}
+  <a href="{{ url_for('loans', status=key) }}" class="{{ 'on' if status == key }}">{{ label }}</a>
+  {% endfor %}
+</nav>
+
+<section class="card">
+{% if loans %}
+  {{ loan_table(loans, url_for('loans', status=status)) }}
+{% else %}
+  <p class="empty">Nothing here.</p>
+{% endif %}
+</section>
+{% endblock %}

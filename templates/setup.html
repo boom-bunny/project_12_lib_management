@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+{% block title %}Set up{% endblock %}
+{% block content %}
+<form method="post" class="auth-card">
+  <div class="brand"><span class="mark"></span>Library</div>
+  <h1>Create the admin account</h1>
+  <p class="lede">This is the first run. Choose the username and password you will sign in with.</p>
+  {{ csrf() }}
+  <label class="field"><span>Full name</span>
+    <input name="full_name" value="{{ form.full_name }}" autocomplete="name" required autofocus>
+  </label>
+  <label class="field"><span>Username</span>
+    <input name="username" value="{{ form.username }}" autocomplete="username" required>
+  </label>
+  <label class="field"><span>Password</span>
+    <input type="password" name="password" autocomplete="new-password" minlength="{{ min_length }}" required>
+    <small>At least {{ min_length }} characters.</small>
+  </label>
+  <label class="field"><span>Confirm password</span>
+    <input type="password" name="confirm" autocomplete="new-password" required>
+  </label>
+  <label class="check"><input type="checkbox" name="sample" checked> Add ten sample books to start with</label>
+  <button class="btn primary wide">Create account</button>
+</form>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, badge %}
+{% block title %}Staff{% endblock %}
+{% block content %}
+<header class="page-head"><h1>Staff accounts</h1></header>
+
+<section class="card">
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Created</th><th></th></tr></thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td class="strong">{{ u.full_name }}</td>
+      <td class="mono">{{ u.username }}</td>
+      <td>{{ badge(u.role) }}</td>
+      <td>{{ u.created_on }}</td>
+      <td class="actions">
+        {% if u.id != g.user.id %}
+        <form method="post" action="{{ url_for('staff_delete', user_id=u.id) }}"
+              onsubmit="return confirm('Delete this account?')">
+          {{ csrf() }}<button class="btn small ghost danger">Delete</button>
+        </form>
+        {% else %}<small>you</small>{% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+</section>
+
+<form method="post" class="card form">
+  <h2>Add a staff account</h2>
+  {{ csrf() }}
+  <div class="row">
+    <label class="field"><span>Full name</span><input name="full_name" value="{{ form.full_name }}" required></label>
+    <label class="field"><span>Username</span><input name="username" value="{{ form.username }}" autocomplete="off" required></label>
+  </div>
+  <div class="row">
+    <label class="field"><span>Password</span>
+      <input type="password" name="password" autocomplete="new-password" minlength="{{ min_length }}" required>
+      <small>At least {{ min_length }} characters.</small>
+    </label>
+    <label class="field"><span>Confirm password</span>
+      <input type="password" name="confirm" autocomplete="new-password" required>
+    </label>
+  </div>
+  <label class="field"><span>Role</span>
+    <select name="role">
+      <option value="librarian" {{ 'selected' if form.role == 'librarian' }}>Librarian — books, members and loans</option>
+      <option value="admin" {{ 'selected' if form.role == 'admin' }}>Admin — also manages staff accounts</option>
+    </select>
+  </label>
+  <div class="form-actions"><button class="btn primary">Create account</button></div>
+</form>
+{% endblock %}

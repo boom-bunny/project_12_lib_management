@@ -1,0 +1,46 @@
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}
+
+{% macro field(name, label, value='', type='text', required=false, hint='', attrs='') %}
+<label class="field">
+  <span>{{ label }}{% if not required %} <em>optional</em>{% endif %}</span>
+  <input type="{{ type }}" name="{{ name }}" value="{{ value if value is not none else '' }}"
+         {% if required %}required{% endif %} {{ attrs|safe }}>
+  {% if hint %}<small>{{ hint }}</small>{% endif %}
+</label>
+{% endmacro %}
+
+{% macro badge(status) %}
+<span class="badge {{ {'overdue': 'bad', 'on loan': 'info', 'returned': 'muted', 'available': 'good',
+                       'all out': 'bad', 'active': 'good', 'inactive': 'muted', 'admin': 'info',
+                       'librarian': 'muted'}.get(status, 'muted') }}">{{ status }}</span>
+{% endmacro %}
+
+{% macro loan_table(loans, back, show_actions=true) %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Book</th><th>Member</th><th>Issued</th><th>Due</th><th>Status</th><th class="num">Fine</th>{% if show_actions %}<th></th>{% endif %}</tr></thead>
+  <tbody>
+  {% for loan in loans %}
+    <tr>
+      <td class="strong">{{ loan.book_title }}</td>
+      <td>{{ loan.member_name }}</td>
+      <td>{{ loan.issued_on }}</td>
+      <td>{{ loan.due_on }}</td>
+      <td>{{ badge(loan.status) }}{% if loan.late_days %} <small>{{ loan.late_days }}d late</small>{% endif %}</td>
+      <td class="num">{% if loan.fine %}{{ currency }}{{ loan.fine }}{% else %}–{% endif %}</td>
+      {% if show_actions %}
+      <td class="actions">
+        {% if not loan.returned_on %}
+        <form method="post" action="{{ url_for('loan_return', loan_id=loan.id) }}">
+          {{ csrf() }}<input type="hidden" name="back" value="{{ back }}">
+          <button class="btn small">Return</button>
+        </form>
+        {% else %}<small>returned {{ loan.returned_on }}</small>{% endif %}
+      </td>
+      {% endif %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endmacro %}

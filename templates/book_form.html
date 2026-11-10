@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, field %}
+{% block title %}{{ 'Edit book' if editing else 'Add book' }}{% endblock %}
+{% block content %}
+<header class="page-head"><h1>{{ 'Edit book' if editing else 'Add book' }}</h1></header>
+<form method="post" class="card form">
+  {{ csrf() }}
+  {{ field('title', 'Title', book.title, required=true, attrs='autofocus maxlength="200"') }}
+  {{ field('author', 'Author', book.author, required=true, attrs='maxlength="200"') }}
+  <div class="row">
+    {{ field('category', 'Category', book.category, attrs='maxlength="60"') }}
+    {{ field('isbn', 'ISBN', book.isbn, attrs='maxlength="20"') }}
+  </div>
+  <div class="row">
+    {{ field('year', 'Year published', book.year, type='number', attrs='min="1" max="2100"') }}
+    {{ field('total_copies', 'Copies owned', book.total_copies, type='number', required=true, attrs='min="1" max="9999"') }}
+  </div>
+  <div class="form-actions">
+    <button class="btn primary">{{ 'Save changes' if editing else 'Add book' }}</button>
+    <a class="btn ghost" href="{{ url_for('books') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

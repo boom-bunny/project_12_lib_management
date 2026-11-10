@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import loan_table %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1>Dashboard</h1>
+  <a class="btn primary" href="{{ url_for('loan_issue') }}">Issue a book</a>
+</header>
+
+<section class="stats">
+  <a class="stat" href="{{ url_for('books') }}"><span>Titles</span><strong>{{ stats.titles }}</strong><small>{{ stats.copies }} copies</small></a>
+  <a class="stat" href="{{ url_for('books') }}"><span>Available</span><strong>{{ stats.available }}</strong><small>copies on the shelf</small></a>
+  <a class="stat" href="{{ url_for('members') }}"><span>Members</span><strong>{{ stats.members }}</strong><small>active</small></a>
+  <a class="stat" href="{{ url_for('loans') }}"><span>On loan</span><strong>{{ stats.on_loan }}</strong><small>copies out</small></a>
+  <a class="stat {{ 'alert' if stats.overdue }}" href="{{ url_for('loans', status='overdue') }}"><span>Overdue</span><strong>{{ stats.overdue }}</strong><small>need follow-up</small></a>
+</section>
+
+{% if overdue %}
+<section class="card">
+  <h2>Overdue</h2>
+  {{ loan_table(overdue, url_for('dashboard')) }}
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>Recent activity</h2>
+  {% if recent %}
+    {{ loan_table(recent, url_for('dashboard')) }}
+  {% else %}
+    <p class="empty">No loans yet. Add some <a href="{{ url_for('members') }}">members</a>, then <a href="{{ url_for('loan_issue') }}">issue a book</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

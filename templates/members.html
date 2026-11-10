@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, badge %}
+{% block title %}Members{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1>Members</h1>
+  <a class="btn primary" href="{{ url_for('member_new') }}">Add member</a>
+</header>
+
+<form class="search" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search name, email or phone" aria-label="Search members">
+  <button class="btn">Search</button>
+  {% if q %}<a class="btn ghost" href="{{ url_for('members') }}">Clear</a>{% endif %}
+</form>
+
+<section class="card">
+{% if members %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th class="num">On loan</th><th></th></tr></thead>
+  <tbody>
+  {% for m in members %}
+    <tr>
+      <td class="strong">{{ m.name }}</td>
+      <td>{{ m.email or '–' }}</td>
+      <td>{{ m.phone or '–' }}</td>
+      <td>{{ m.joined_on }}</td>
+      <td>{{ badge('active' if m.active else 'inactive') }}</td>
+      <td class="num">{{ m.on_loan }}</td>
+      <td class="actions">
+        {% if m.active %}<a class="btn small" href="{{ url_for('loan_issue', member_id=m.id) }}">Issue</a>{% endif %}
+        <a class="btn small ghost" href="{{ url_for('member_edit', member_id=m.id) }}">Edit</a>
+        <form method="post" action="{{ url_for('member_delete', member_id=m.id) }}"
+              onsubmit="return confirm('Delete this member and their loan history?')">
+          {{ csrf() }}<button class="btn small ghost danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% elif q %}
+  <p class="empty">No members match “{{ q }}”.</p>
+{% else %}
+  <p class="empty">No members yet. <a href="{{ url_for('member_new') }}">Add the first member</a>.</p>
+{% endif %}
+</section>
+{% endblock %}

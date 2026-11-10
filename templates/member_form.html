@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, field %}
+{% block title %}{{ 'Edit member' if editing else 'Add member' }}{% endblock %}
+{% block content %}
+<header class="page-head"><h1>{{ 'Edit member' if editing else 'Add member' }}</h1></header>
+<form method="post" class="card form">
+  {{ csrf() }}
+  {{ field('name', 'Full name', member.name, required=true, attrs='autofocus maxlength="120"') }}
+  <div class="row">
+    {{ field('email', 'Email', member.email, type='email', attrs='maxlength="120"') }}
+    {{ field('phone', 'Phone', member.phone, type='tel', attrs='maxlength="30"') }}
+  </div>
+  {% if editing %}
+  <label class="check"><input type="checkbox" name="active" {{ 'checked' if member.active }}> Active (can borrow books)</label>
+  {% endif %}
+  <div class="form-actions">
+    <button class="btn primary">{{ 'Save changes' if editing else 'Add member' }}</button>
+    <a class="btn ghost" href="{{ url_for('members') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

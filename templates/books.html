@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, badge %}
+{% block title %}Books{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1>Books</h1>
+  <a class="btn primary" href="{{ url_for('book_new') }}">Add book</a>
+</header>
+
+<form class="search" method="get">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search title, author, ISBN or category" aria-label="Search books">
+  <button class="btn">Search</button>
+  {% if q %}<a class="btn ghost" href="{{ url_for('books') }}">Clear</a>{% endif %}
+</form>
+
+<section class="card">
+{% if books %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>ISBN</th><th class="num">Year</th><th>Availability</th><th></th></tr></thead>
+  <tbody>
+  {% for b in books %}
+    {% set free = b.total_copies - b.on_loan %}
+    <tr>
+      <td class="strong">{{ b.title }}</td>
+      <td>{{ b.author }}</td>
+      <td>{{ b.category or '–' }}</td>
+      <td class="mono">{{ b.isbn or '–' }}</td>
+      <td class="num">{{ b.year or '–' }}</td>
+      <td>{{ badge('available' if free else 'all out') }} <small>{{ free }} of {{ b.total_copies }}</small></td>
+      <td class="actions">
+        {% if free %}<a class="btn small" href="{{ url_for('loan_issue', book_id=b.id) }}">Issue</a>{% endif %}
+        <a class="btn small ghost" href="{{ url_for('book_edit', book_id=b.id) }}">Edit</a>
+        <form method="post" action="{{ url_for('book_delete', book_id=b.id) }}"
+              onsubmit="return confirm('Delete this book and its loan history?')">
+          {{ csrf() }}<button class="btn small ghost danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% elif q %}
+  <p class="empty">No books match “{{ q }}”.</p>
+{% else %}
+  <p class="empty">The catalogue is empty. <a href="{{ url_for('book_new') }}">Add the first book</a>.</p>
+{% endif %}
+</section>
+{% endblock %}

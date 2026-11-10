@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf %}
+{% block title %}Issue a book{% endblock %}
+{% block content %}
+<header class="page-head"><h1>Issue a book</h1></header>
+{% if not books or not members %}
+<section class="card">
+  <p class="empty">
+    {% if not books %}No copies are available to issue. <a href="{{ url_for('books') }}">Go to books</a>.{% endif %}
+    {% if not members %}There are no active members. <a href="{{ url_for('member_new') }}">Add a member</a>.{% endif %}
+  </p>
+</section>
+{% else %}
+<form method="post" class="card form">
+  {{ csrf() }}
+  <label class="field"><span>Book</span>
+    <select name="book_id" required>
+      <option value="">Choose a book…</option>
+      {% for b in books %}
+      <option value="{{ b.id }}" {{ 'selected' if form.book_id|string == b.id|string }}>{{ b.title }} — {{ b.author }} ({{ b.free }} available)</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="field"><span>Member</span>
+    <select name="member_id" required>
+      <option value="">Choose a member…</option>
+      {% for m in members %}
+      <option value="{{ m.id }}" {{ 'selected' if form.member_id|string == m.id|string }}>{{ m.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label class="field"><span>Due date</span>
+    <input type="date" name="due_on" value="{{ form.due_on }}" min="{{ today }}" required>
+  </label>
+  <div class="form-actions">
+    <button class="btn primary">Issue book</button>
+    <a class="btn ghost" href="{{ url_for('loans') }}">Cancel</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}

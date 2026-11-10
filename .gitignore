@@ -1,0 +1,5 @@
+# database and session secret key - never commit
+data/
+__pycache__/
+*.pyc
+.venv/
